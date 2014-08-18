@@ -1,0 +1,15 @@
+<trafficrep>
+	
+	<!-- the filter used to detect NTP (or whatever) packets -->
+	<pcapfilter>dst port 123 and dst a.b.c.d </pcapfilter>
+	
+	<interface>eth0</interface>
+	
+	<!-- maximum time to store client requests (in seconds) -->
+	<maxhistory>120</maxhistory>
+	
+	<!-- listen port for http requests -->
+	<port>7777</port>
+	
+
+</trafficrep>

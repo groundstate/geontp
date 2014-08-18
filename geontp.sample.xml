@@ -1,0 +1,86 @@
+<geontp>
+
+	<pollinterval>31</pollinterval>
+
+	<citydb>auscities.db</citydb>
+	<clientdb>client.db</clientdb>
+	
+	<image>
+		<!-- path to the image file -->
+		<file>textures/freeaus.png</file>
+		<!-- -->
+		<!-- bounding box for the map, all in degrees -->
+		<latupperleft>7.4</latupperleft>
+		<lonupperleft>89.8667</lonupperleft>
+		<latlowerright> -47.4 </latlowerright>
+		<lonlowerright>180.0</lonlowerright>
+		<!-- Mercator or equirectangular -->
+		<projection>mercator</projection>
+		<xroll>7.0</xroll>
+	</image>
+	
+	<display>
+		<!-- Show state borders -->
+		<borders>yes</borders>
+		<!-- Display client IPs -->
+		<ips>yes</ips>
+		<!-- Anonymise displayed IPs -->
+		<anonymise>yes</anonymise>
+		<!-- Display co-ordinate grid -->
+		<grid>yes</grid>
+		<!-- Display town and city names -->
+		<placenames>yes</placenames>
+		<!-- Display path from client to server -->
+		<paths>yes</paths>
+	</display>
+	
+	<aliens>
+		<track>yes</track>
+		<file>aliens.txt</file>
+		<!-- Dump to file when max is reached and clear the list --> 
+		<max>1000</max>
+	</aliens>
+	
+	<server>
+		<name>ntp1.somewhere.au</name>
+		<port>7777</port>
+		<latitude>-34.92869</latitude>
+		<longitude>138.60102</longitude>
+	</server>
+	
+	<server>
+		<name>ntp2.somewhere.au</name>
+		<port>7777</port>
+		<latitude>-27.4679</latitude>
+		<longitude>153.0278</longitude>
+	</server>
+	
+	<server>
+		<name>ntp3.somewhere.au</name>
+		<port>7777</port>
+		<latitude>-33.866666667</latitude>
+		<longitude>151.2</longitude>
+	</server>
+	
+	<!-- Monitor power management -->
+	<power>
+		<!-- Conserve power by switching off at specified times  (yes/no) -->
+		<conserve>no</conserve>
+		<!-- Turn off completely on the weekend (yes/no) -->
+		<weekends>yes</weekends>
+		<!-- power on time, specified in the format HH:MM:SS (24 hour clock, leading zeroes required)-->
+		<on>19:00:00</on>
+		<!-- power off time, specified in the format HH:MM:SS (24 hour clock, leading zeroes required)-->
+		<off>20:22:00</off>
+		<!-- number of minutes that a keypress or mouse event etc will override power saving -->
+		<overridetime>60</overridetime>
+	</power>
+	
+	<proxy>
+		<server></server>
+		<port></port>
+		<user></user>
+		<password></password>
+	</proxy>
+		
+</geontp>
