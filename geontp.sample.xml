@@ -1,24 +1,29 @@
 <geontp>
-
+  <!-- Remote NTP servers are polled every pollinterval seconds -->
 	<pollinterval>31</pollinterval>
 
+	<!-- File containing names and locations of towns and cities -->
 	<citydb>auscities.db</citydb>
+	<!-- File containing client IPs and the twon/city where they are located -->
 	<clientdb>client.db</clientdb>
 	
 	<image>
-		<!-- path to the image file -->
+		<!-- path to the map file -->
 		<file>textures/freeaus.png</file>
-		<!-- -->
 		<!-- bounding box for the map, all in degrees -->
 		<latupperleft>7.4</latupperleft>
 		<lonupperleft>89.8667</lonupperleft>
 		<latlowerright> -47.4 </latlowerright>
 		<lonlowerright>180.0</lonlowerright>
-		<!-- Mercator or equirectangular -->
+		<!-- Projection used by image - Mercator or equirectangular -->
 		<projection>mercator</projection>
+		<!-- Tweak rotation about x-axis (screen horizontal) units are degrees -->
 		<xroll>7.0</xroll>
+		<!-- Tweak rotation about y-axis (screen vertical) units are degrees -->
+		<yroll>0.0</yroll>
 	</image>
 	
+	<!-- Various options controlling what is shown on the display -->
 	<display>
 		<!-- Show state borders -->
 		<borders>yes</borders>
@@ -26,7 +31,7 @@
 		<ips>yes</ips>
 		<!-- Anonymise displayed IPs -->
 		<anonymise>yes</anonymise>
-		<!-- Display co-ordinate grid -->
+		<!-- Display latitude/longitude grid -->
 		<grid>yes</grid>
 		<!-- Display town and city names -->
 		<placenames>yes</placenames>
@@ -34,15 +39,20 @@
 		<paths>yes</paths>
 	</display>
 	
+	<!-- Aliens are IPs not in our database -->
 	<aliens>
+		<!-- Should we log the IPs ? -->
 		<track>yes</track>
+		<!--- File to dump aliens to -->
 		<file>aliens.txt</file>
 		<!-- Dump to file when max is reached and clear the list --> 
 		<max>1000</max>
 	</aliens>
 	
+	<!-- Entries for the servers we are monitoring -->
 	<server>
 		<name>ntp1.somewhere.au</name>
+		<!-- port that the agent trafficrep is listening on -->
 		<port>7777</port>
 		<latitude>-34.92869</latitude>
 		<longitude>138.60102</longitude>
@@ -76,6 +86,7 @@
 		<overridetime>60</overridetime>
 	</power>
 	
+	<!-- Proxy server configuration -->
 	<proxy>
 		<server></server>
 		<port></port>

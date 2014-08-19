@@ -231,7 +231,7 @@ void MapWidget::paintGL()
 	glTranslatef(0,0,-1100);
 
 	glRotatef(-(90 - (lat0-(lat0-lat1)/2.0))-rollx,1,0,0);
-	glRotatef(270-((lon1+lon0)/2.0),0,0,1);
+	glRotatef(270-((lon1+lon0)/2.0)-rolly,0,0,1);
 	
 	glPolygonMode(GL_FRONT,GL_FILL);
 	glCallList(mapdl);

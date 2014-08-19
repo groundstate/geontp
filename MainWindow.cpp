@@ -483,6 +483,9 @@ void MainWindow::readConfig(QString s){
 				else if (cel.tagName() == "xroll"){
 					xroll=cel.text().toDouble();
 				}
+				else if (cel.tagName() == "yroll"){
+					yroll=cel.text().toDouble();
+				}
 				cel=cel.nextSiblingElement();
 			}
 		}
