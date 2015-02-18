@@ -31,8 +31,11 @@
 #include <QtGui>
 #include <QDomDocument>
 #include <QtDebug>
+#include <QAction>
 #include <QRegExp>
 #include <QFile>
+#include <QHBoxLayout>
+#include <QMenu>
 #include <QTextStream>
 
 #include "City.h"

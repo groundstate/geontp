@@ -13,6 +13,9 @@ SOURCES       = GLText.cpp \
 								PowerManager.cpp \
 								ServerPoll.cpp \
 								MainWindow.cpp
-QT           += opengl xml network
-CONFIG       += debug
+QT           += core gui opengl xml network
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+
+CONFIG       += 
+#CONFIG       += debug
 LIBS +=  -lglut -lGLU

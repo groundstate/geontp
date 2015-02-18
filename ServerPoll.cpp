@@ -27,7 +27,7 @@
 #include <time.h>
 
 #include <QtDebug>
-#include <Qt/QtNetwork>
+#include <QtNetwork>
 #include <QTimer>
 
 #include "ServerPoll.h"
