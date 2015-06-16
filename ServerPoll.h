@@ -66,6 +66,7 @@ class ServerPoll:public QObject{
 		
 		QNetworkAccessManager *netManager;
 		QTimer *timer_;
+		bool queryRunning;
 };
 
 #endif

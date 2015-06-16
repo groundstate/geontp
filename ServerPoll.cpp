@@ -47,6 +47,8 @@ ServerPoll::ServerPoll(QString server,int port,
 	proxyUser_=proxyUser;
 	proxyPassword_=proxyPassword;
 	
+	queryRunning=false;
+	
 	httpQuery_= "http://"+server_+":"+ QString::number(port_)+"/?last="+QString::number(pollInterval_);
 	qDebug() << httpQuery_;
 	
@@ -84,6 +86,12 @@ void ServerPoll::setProxy(QString proxyServer,int proxyPort,QString proxyUser, Q
 //
 
 void ServerPoll::startQuery(){
+	if (queryRunning){
+		qDebug() << server_ << ":nothing received";
+		QByteArray ba;
+		emit clientDataReceived(server_,ba);
+	}
+	queryRunning=false;
 	netManager->get(QNetworkRequest(QUrl(httpQuery_)));
 	timer_->start(pollInterval_*1000);
 }
@@ -91,9 +99,16 @@ void ServerPoll::startQuery(){
 void ServerPoll::replyFinished(QNetworkReply *reply){
 
 	QNetworkReply::NetworkError err = reply->error();
+	queryRunning=false; // whatever happened, it's over
 	if (err == QNetworkReply::NoError){
 			qDebug() << "Got something from " << server_;
 		QByteArray ba = reply->readAll();
+		emit clientDataReceived(server_,ba);
+	}
+	else
+	{
+		qDebug() << server_ << ":network error";
+		QByteArray ba;
 		emit clientDataReceived(server_,ba);
 	}
 	// FIXME do i have to delete the reply with deleteLater

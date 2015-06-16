@@ -179,7 +179,7 @@ MainWindow::MainWindow(QStringList & args){
 	
 	QHBoxLayout *hb = new QHBoxLayout(this);
 	hb->setContentsMargins(0,0,0,0);
-	mapWidget = new MapWidget(cities,mapFileName,lat0,lon0,lat1,lon1,projection,xroll,yroll,this);
+	mapWidget = new MapWidget(cities,servers,mapFileName,lat0,lon0,lat1,lon1,projection,xroll,yroll,this);
 	hb->addWidget(mapWidget);
 
 	mapWidget->setBordersOn(showBorders);
@@ -213,7 +213,7 @@ void MainWindow::scheduler(){
 		while  (j<servers[i]->clients.size()){
 			ClientPollRecord *cr = servers[i]->clients.at(j);
 			if (cr->polltime.tv_sec - tnow.tv_sec + (cr->polltime.tv_usec - tnow.tv_usec)/1.0E6< 0){
-				qDebug() << "Dispatching: " << cr->ip<< ": now " <<servers[i]->clients.size() <<  " " << cr->polltime.tv_sec << " " << cr->polltime.tv_usec;
+				//qDebug() << "Dispatching: " << cr->ip<< ": now " <<servers[i]->clients.size() <<  " " << cr->polltime.tv_sec << " " << cr->polltime.tv_usec;
 				mapWidget->addNTPPoller(cr,servers[i]->lat,servers[i]->lon);
 				servers[i]->clients.removeAt(j);
 				delete cr;
@@ -246,6 +246,11 @@ void MainWindow::updateClientData(QString server, QByteArray data){
 		return;
 	}	
 
+	if (data.isEmpty()){
+		servers[serverID]->appendToHistory(0);
+		return;
+	}
+	
 	// data is delineated by <body> tag
 	// binary data format is
 	// reference_time_secs reference_time_msecs IP   dt_msecs IP  dt_msecs .....
@@ -265,7 +270,7 @@ void MainWindow::updateClientData(QString server, QByteArray data){
 		return;
 	}
 	bufend--; // point to the last character in the buffer
-	qDebug() << bufbegin << " " << bufend << " " << bufend-bufbegin+1;
+	//qDebug() << bufbegin << " " << bufend << " " << bufend-bufbegin+1;
 	// (bufend-bufbegin+1) % 8 should equal 4
 	if (((bufend-bufbegin+1) % 8) != 4){
 		qDebug() << "unexpected number of bytes in data block";
@@ -280,7 +285,7 @@ void MainWindow::updateClientData(QString server, QByteArray data){
 	if (8==sizeof(long int)){
 		csptr += bufbegin;
 		unsigned long int *trefs_uli = (unsigned long int *) csptr;
-		qDebug() <<  *trefs_uli;
+		//qDebug() <<  *trefs_uli;
 		tref_s = (time_t) *trefs_uli;
 	}
 	else if (8==sizeof(long long int)){
@@ -288,7 +293,7 @@ void MainWindow::updateClientData(QString server, QByteArray data){
 	
 	csptr += 8;
 	unsigned  int *trefms_ui = (unsigned  int *) csptr;
-	qDebug() << *trefms_ui;
+	//qDebug() << *trefms_ui;
 	tref_us = (*trefms_ui) * 1000;
 	
 	csptr += 4;
@@ -300,10 +305,10 @@ void MainWindow::updateClientData(QString server, QByteArray data){
 		in_addr_t *ip= (in_addr_t *) csptr;
 		addr.s_addr=*ip;
 		QString  ipstr(inet_ntoa(addr));
-		qDebug() << ipstr;
+		//qDebug() << ipstr;
 		csptr += 4;
 		unsigned  int *dtPollms = (unsigned  int *) csptr;
-		qDebug() << *dtPollms;
+		//qDebug() << *dtPollms;
 		csptr += 4;
 		
 		// first in will be last out - just what we want
@@ -314,20 +319,20 @@ void MainWindow::updateClientData(QString server, QByteArray data){
 			client = new Client(ipstr,0,0,true); // you are an alien
 			clients[ipstr]=client;
 			aliens.append(client);
-			qDebug() << "alien: " << ipstr;
+			//qDebug() << "alien: " << ipstr;
 		}
 		
 		// Construct the poll time
 		// Poll times have a maximum latency of pollInterval
 		struct timeval ptime=tnow;
 		double delay = pollInterval - ((tnow.tv_sec - tref_s) + (tnow.tv_usec - tref_us)/1.0E6 - (*dtPollms)/1.0E3);
-		qDebug() << tref_s  << tref_us/1.0E6+(*dtPollms)/1.0E3 << delay;
+		//qDebug() << tref_s  << tref_us/1.0E6+(*dtPollms)/1.0E3 << delay;
 	
 		double t = ptime.tv_sec + (double) ptime.tv_usec/1.0E6 + delay;	
 		ptime.tv_sec = (int) t;
 		ptime.tv_usec = (int) ((t - ptime.tv_sec)*1.0E6);
 		
-		qDebug() << ptime.tv_sec << " " << ptime.tv_usec;
+		//qDebug() << ptime.tv_sec << " " << ptime.tv_usec;
 		QString displayedIP = client->formattedIP;
 		if (anonymiseIPs){
 			displayedIP = QString::number((int) ((double)rand()/ (double) RAND_MAX * 128+127))+ "." +
@@ -339,7 +344,7 @@ void MainWindow::updateClientData(QString server, QByteArray data){
 			new ClientPollRecord(displayedIP,client->lat,client->lon,ptime,client->alien);
 		servers[serverID]->clients.append(cprec);							
 	}
-	
+	servers[serverID]->appendToHistory(nrec);
 }
 
 void MainWindow::toggleFullScreen(){
@@ -613,6 +618,9 @@ void MainWindow::readConfig(QString s){
 	// post-config cleanups
 	for (int i=0;i<pollers.size();i++)
 		pollers.at(i)->setProxy(proxyServer,proxyPort,proxyUser,proxyPassword);
+	for (int i=0;i<servers.size();i++)
+		servers.at(i)->pollInterval=pollInterval;
+	
 }
 
 void MainWindow::createActions()

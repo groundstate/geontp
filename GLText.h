@@ -40,7 +40,7 @@ class GLText{
 		GLText(QGLWidget *,QString,QFont,QColor color= QColor(255,255,255,255));
 		~GLText();
 
-		void paint(int,int);
+		void paint(int,int,int z=0);
 		
 		GLuint texture;
 		int w,h;

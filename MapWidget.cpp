@@ -38,6 +38,7 @@
 #include "ClientPollRecord.h"
 #include "GLText.h"
 #include "MapWidget.h"
+#include "Server.h"
 
 #define CHECK_GLERROR() \
 { \
@@ -78,7 +79,7 @@ float border[]={2,-14.883333333,129.0,-31.7,129.0, // WA
 //
 //
 
-MapWidget::MapWidget(QHash<QString,City *> &c,
+MapWidget::MapWidget(QHash<QString,City *> &c,QList<Server *> &s,
 		QString mapFile,double ullat,double ullon,double lrlat,double lrlon,int prj,double rx,double ry,
 		QWidget *parent, QGLWidget *shareWidget)
     : QGLWidget(parent, shareWidget)
@@ -93,7 +94,6 @@ MapWidget::MapWidget(QHash<QString,City *> &c,
 	rollx=rx;
 	rolly=ry;
 	
-	qDebug() << lat0 << lon0 << lat1 << lon1 << rollx;
 	mapdl =0;
 	griddl=0;
 	trafficAlpha=0.3;
@@ -101,9 +101,10 @@ MapWidget::MapWidget(QHash<QString,City *> &c,
 	plotx=0.15;
 	ploty=0.02;
 	plotw=0.4;
-	ploth=0.15;
-	plotmargin=0.01;
-
+	ploth=0.18;
+	plotleftmargin=0.033;
+	plotbottommargin=0.033;
+	
 	showGrid=false; 
 	showIP=true;
 	showTraffic=false;
@@ -112,7 +113,10 @@ MapWidget::MapWidget(QHash<QString,City *> &c,
 	showPlaceNames=true;
 
 	cities=c;
-
+	servers=s;
+	currServer=0;
+	transitionStarted=false;
+	
 	projectionDirty=true;
 	
 	QTimer *timer = new QTimer(this);
@@ -274,6 +278,7 @@ void MapWidget::paintGL()
 	showText();
 	
 	
+	
 }
 
 void MapWidget::resizeGL(int width, int height)
@@ -360,6 +365,17 @@ void MapWidget::initTextures()
 		//std::cerr << c->gltext->w << " " << c->gltext->h << std::endl;
 		++i;
 	}
+	
+	for (int i=0;i<servers.size();i++)
+			serverNames.push_back(new GLText(this,servers.at(i)->name,f));
+	
+	for (int i=0;i<=9;i++){
+		units_.push_back(new GLText(this,QString::number(i),f));
+		tens_.push_back(new GLText(this,QString::number(i*10),f)); // don't care about duplicate zero
+		hundreds_.push_back(new GLText(this,QString::number(i*100),f));
+	}
+	plotXAxisLabel_=new GLText(this,"time (hours prior to now)",f);
+	plotYAxisLabel_=new GLText(this,"requests/min",f);
 	
  	f.setPointSize(36);
 	f.setBold(false);
@@ -592,40 +608,119 @@ void MapWidget::showTrafficPlot()
 	struct timeval tnow;
 	gettimeofday(&tnow,NULL);
 	double dt = tnow.tv_sec - trafficT.tv_sec + (tnow.tv_usec - trafficT.tv_usec)/1.0E6;
-	float alphaScaling=1.0;
-	if (dt < 5)
-		alphaScaling *= dt/5.0;
-	else if (dt > 25 && dt < 30)
-		alphaScaling *= (1.0- (dt-25.0)/5.0);
-	else if (dt >=30.0)
-	{
-		trafficT=tnow;
-		alphaScaling=0;
+	float rot=0.0;
+	float sf=1.0;
+	
+	if (dt >=13 && dt < 14){
+		rot=90.0*(dt-13)/1.0; // 0 to 90
 	}
+	else if (dt >= 14 && dt < 15){
+		if (!transitionStarted){
+			currServer = currServer+1;
+			if (currServer == servers.size())
+				currServer=0;
+			transitionStarted=true;
+		}
+		sf=-1.0;
+		rot=90.0*(dt-13.0)/1.0; // 90 to 180
+	}
+	else if (dt >= 15){
+		trafficT=tnow;
+		transitionStarted=false;
+	}
+
+	
 	float x0 = plotx*width();
 	float y0 = ploty*height();
-	float x1 = (plotx+plotw)*width();
-	float y1 = (ploty+ploth)*height();
-	float m =  plotmargin*width();
-
+	
+	float pw = plotw*width();
+	float ph = ploth*height();
+	float plm = plotleftmargin*width();
+	float pbm = plotbottommargin*height();
+	
+	glLineWidth(1.0);
+	
+	glPushMatrix();
+	
+	float dy=-200;
+	
+	glTranslatef(x0+pw/2,y0+ph/2.0,dy);
+	glRotatef(rot,1,0,0);
+	glScalef(1.0,sf,1.0);
 	glEnable(GL_BLEND);
  	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//glBlendFunc(GL_ONE, GL_SRC_ALPHA);
-	glColor4f(0.8,0.8,0.8,0.2*alphaScaling);
-	glBegin(GL_QUADS);
-	glVertex3f(x0,y0,0);
-	glVertex3f(x1,y0,0);
-	glVertex3f(x1,y1,0);
-	glVertex3f(x0,y1,0);
-	glEnd();
-	glColor4f(0.9,0.9,0.9,1.0*alphaScaling);
+	
+	glColor4f(0.9,0.9,0.9,1.0);
+	glLineWidth(2.0);
 	glBegin(GL_LINES);
-	glVertex3f(x0+m,y1-m,-0.001);
-	glVertex3f(x0+m,y0+m,-0.001);
-	glVertex3f(x0+m,y0+m,-0.001);
-	glVertex3f(x1-m,y0+m,-0.001);
+	glVertex3f(-pw/2.0+plm,-ph/2.0+pbm,-1*sf);
+	glVertex3f(pw/2.0,-ph/2.0+pbm,-1*sf);
+	glVertex3f(-pw/2.0+plm,-ph/2.0+pbm,-1*sf);
+	glVertex3f(-pw/2.0+plm,ph/2.0,-1*sf);
 	glEnd();
+	
+	Server *srv = servers.at(currServer);
+	// FIXME - completely adhoc axis scaling here
+	// x tics
+	double historyLength = srv->pollInterval*srv->historyLength*srv->summingLength; 
+	int ntenhours = trunc((historyLength/3600.0)/10);
+	if (ntenhours > 9) ntenhours=9;
+	double xsf = (pw-plm)*3600.0/historyLength; // in units of hours
+	double ysf = (ph - pbm)/400.0; // FIXME
+	double ticlen=7.0;
+	glBegin(GL_LINES);
+	for (int i=0;i<=ntenhours;i++){
+		float xtic=pw/2.0-i*10.0*xsf;
+		glVertex3f(xtic,-ph/2.0+pbm,-1*sf);
+		glVertex3f(xtic,-ph/2.0+pbm-ticlen,-1*sf);
+	}
+	for (int i=0;i<=4;i+=2){
+		float ytic=-ph/2.0+pbm+i*100*ysf;
+		glVertex3f(-pw/2.0+plm,ytic,-1*sf);
+		glVertex3f(-pw/2.0+plm-ticlen,ytic,-1*sf);
+	}
+	glEnd();
+	glEnable(GL_TEXTURE_RECTANGLE_ARB);
+	for (int i=0;i<=ntenhours;i++){
+		float xtic=pw/2.0-i*10.0*xsf;	
+		tens_[i]->paint(xtic-tens_[i]->w/2.0,-ph/2.0+pbm-tens_[i]->h,-1*sf);
+	}
+	for (int i=0;i<=4;i+=2){
+		float xtic=-pw/2.0+plm-ticlen-hundreds_[i]->w;
+		float ytic=-ph/2.0+pbm+i*100*ysf;
+		hundreds_[i]->paint(xtic,ytic,-1*sf);
+	}
+	glDisable(GL_TEXTURE_RECTANGLE_ARB);
+	
+	glPushMatrix();
+	glTranslatef(-pw/2+plm,-ph/2+pbm,0);
+	glColor4f(1,1,0,0.8);
+	
+	xsf = (pw - plm)/srv->historyLength; 
+	
+	if (srv->longHistory.size() > 1){
+		glLineWidth(1.0);
+		glBegin(GL_LINE_STRIP);
+		for (int i=srv->longHistory.size()-1;i>=0;i--){
+			//glVertex3f(i*xsf,0.0,-1*sf);
+			glVertex3f((srv->historyLength-(srv->longHistory.size()-1-i))*xsf,srv->longHistory[i]*ysf,-1*sf);
+		}
+		glEnd();
+	}
+	glPopMatrix();
+	
+	glEnable(GL_TEXTURE_RECTANGLE_ARB);
+	serverNames.at(currServer)->paint(-serverNames.at(currServer)->w/2,ph/2.0-serverNames.at(currServer)->h,-1*sf);
+	plotXAxisLabel_->paint(-plotXAxisLabel_->w/2,-ph/2.0,-1*sf);
+	glPushMatrix();
+	glRotatef(90,0,0,1);
+	plotYAxisLabel_->paint(-plotYAxisLabel_->w/2,pw/2-plotYAxisLabel_->h,-1*sf);
+	glPopMatrix();
+	glDisable(GL_TEXTURE_RECTANGLE_ARB);
 	glDisable(GL_BLEND);
+	
+	glPopMatrix();
+	//printf("%i %i %i %i\n",(int) x0,(int) y0,(int) x1,(int) y1);
 }
 
 void MapWidget::showStateBorders()
@@ -708,7 +803,7 @@ void MapWidget::showText()
 	
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0, width(), 0, height(),1,-10);
+	glOrtho(0, width(), 0, height(),400,-400);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	
@@ -734,9 +829,9 @@ void MapWidget::showText()
 				yoffset = -(c->gltext->h - c->gltext->baseline)/2;
 			
 			if (c->align & Qt::AlignRight)
-				c->gltext->paint(winx-c->gltext->w,winy+yoffset);
+				c->gltext->paint(winx-c->gltext->w,winy+yoffset,-200);
 			else
-				c->gltext->paint(winx,winy+yoffset);
+				c->gltext->paint(winx,winy+yoffset,-200);
 			++i;
 		}
 	}
@@ -751,21 +846,27 @@ void MapWidget::showText()
 	
 		for (int i=0;i<ips.size();i++)
 		{
-			ips.at(i)->paint(20,height()-i*(fh+5));
+			ips.at(i)->paint(20,height()-i*(fh+5),-200);
 		}
 
+	
 	}
 	
-	titleText->paint(width()-titleText->w-30,height()-titleText->h);
+	titleText->paint(width()-titleText->w-30,height()-titleText->h,-200);
+	
+	glDisable(GL_BLEND);
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_TEXTURE_RECTANGLE_ARB);
+	
+	showTrafficPlot();
+	
 	
 	glMatrixMode(GL_PROJECTION);
 	glLoadMatrixd(projMatrix);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadMatrixd(modelMatrix);
 	
-	glDisable(GL_BLEND);
-	glDisable(GL_TEXTURE_2D);
-	glDisable(GL_TEXTURE_RECTANGLE_ARB);
+
 }
 
 void  MapWidget::createArc(double lat1,double lon1,double lat2,double lon2,

@@ -40,6 +40,7 @@ class QImage;
 class City;
 class ClientPollRecord;
 class GLText;
+class Server;
 
 class PollEvent{
 
@@ -63,7 +64,7 @@ class MapWidget : public QGLWidget{
 
 public:
 
-	MapWidget(QHash<QString,City *> &,
+	MapWidget(QHash<QString,City *> &,QList<Server *> &,
 		QString mapFile,double ullat,double ullon,double lrlat,double lrlon,int prj,double rx,double ry,
 		QWidget *parent = 0, QGLWidget *shareWidget = 0);
 	~MapWidget();
@@ -148,15 +149,24 @@ private:
 
 	float trafficAlpha;
 	struct timeval trafficT;
-	float plotx,ploty,plotw,ploth,plotmargin; // as fractions of the viewport
+	float plotx,ploty,plotw,ploth,plotleftmargin,plotbottommargin; // as fractions of the viewport
 	// data
 
 	QHash<QString,City *> cities;
+	QList<Server *> servers;
 	QList<PollEvent *> pollers;
 	QList<GLText *> ips;
-
+	QList<GLText *> serverNames;
+	
+	QList<GLText *> units_;
+	QList<GLText *> tens_;
+	QList<GLText *> hundreds_;
+	
+	GLText * plotXAxisLabel_,*plotYAxisLabel_;
+	
 	QList<int> serverTraffic[NSERVERS];
-
+	int currServer;
+	bool transitionStarted;
 	int maxips;
 
 	//

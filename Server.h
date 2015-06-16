@@ -29,21 +29,32 @@
 #include <sys/time.h>
 #include <time.h>
 
+#include <QDateTime>
 #include <QList>
 
+class ClientPollRecord;
 
 class Server{
 	public:
 	
-		Server(QString n,double latitude,double longitude){
-			name =n;
-			lat=latitude;
-			lon=longitude;
-		}
+		Server(QString ,double ,double );
 		
 		QString name;
 		double lat,lon;
 		QList<ClientPollRecord *> clients;
+		
+		void setHistoryLength(int);
+		void setSummingLength(int);
+		void appendToHistory(double);
+		
+		int historyLength;
+		int summingLength;
+		int pollInterval;
+		
+		QDateTime lastUpdate;
+		QList<double> shortHistory;
+		QList<double> longHistory;
+		
 };
 
 #endif

@@ -65,22 +65,22 @@ GLText::~GLText(){
 	if (texture) {glDeleteTextures(1,&texture);}
 }
 
-void GLText::paint(int x,int y){
+void GLText::paint(int x,int y,int z){
 	glBindTexture(GL_TEXTURE_RECTANGLE_ARB,texture);
 	
 	glBegin(GL_QUADS);
 	
 	glTexCoord2f(0.0, 0.0);
-	glVertex3f(x,y-baseline,0);
+	glVertex3f(x,y-baseline,z);
 	
 	glTexCoord2f(w,0.0);
-	glVertex3f(x+w,y-baseline,0);
+	glVertex3f(x+w,y-baseline,z);
 	
 	glTexCoord2f(w, h);
-	glVertex3f(x+w,y+h-baseline,0);
+	glVertex3f(x+w,y+h-baseline,z);
 	
 	glTexCoord2f(0, h);
-	glVertex3f(x,y+h-baseline,0);
+	glVertex3f(x,y+h-baseline,z);
 	
 	glEnd();
 }

@@ -49,7 +49,7 @@ class MainWindow : public QWidget
 public:
 
     MainWindow(QStringList &);
-
+		
 private slots:
 
     void scheduler();
