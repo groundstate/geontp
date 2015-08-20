@@ -61,6 +61,7 @@ HTTPThread::HTTPThread(TrafficReporter *a,int p)
 
 HTTPThread::~HTTPThread()
 {
+	shutdown(listenfd,SHUT_RDWR);
 	close(listenfd);
 }
 
@@ -108,7 +109,12 @@ void HTTPThread::doWork()
 			else
 			{
 				processRequest(socketfd);
-				close(socketfd);
+				if (-1==shutdown(socketfd,SHUT_RDWR)){
+					app->log("ERROR in shutdown()");
+				}
+				if (-1==close(socketfd)){
+					app->log("ERROR in close()");
+				}
 			}
 		}
 	}
