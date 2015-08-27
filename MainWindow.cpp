@@ -203,6 +203,7 @@ MainWindow::MainWindow(QStringList & args){
 
 void MainWindow::scheduler(){
 	// run over the queue - if anything is to be displayed within the currentTime
+	powerManager->update();
 	struct timeval tnow;
 	gettimeofday(&tnow,NULL);
 	tnow.tv_usec += updateInterval*1000; // don't need to worry about overflow
