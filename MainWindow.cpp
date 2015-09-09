@@ -179,7 +179,7 @@ MainWindow::MainWindow(QStringList & args){
 	
 	QHBoxLayout *hb = new QHBoxLayout(this);
 	hb->setContentsMargins(0,0,0,0);
-	mapWidget = new MapWidget(cities,servers,mapFileName,lat0,lon0,lat1,lon1,projection,xroll,yroll,this);
+	mapWidget = new MapWidget(cities,servers,mapFileName,texturePath,lat0,lon0,lat1,lon1,projection,xroll,yroll,this);
 	hb->addWidget(mapWidget);
 
 	mapWidget->setBordersOn(showBorders);
@@ -420,7 +420,7 @@ void MainWindow::setDefaults(){
 	
 	citydb="auscities.db";
 	clientdb = "client.db";
-	
+	texturePath="./";
 	trackAliens=true;
 	aliensFile="aliens.txt";
 	maxAliens=1000;
@@ -461,6 +461,9 @@ void MainWindow::readConfig(QString s){
 		}
 		else if (elem.tagName()=="clientdb"){
 			clientdb = elem.text().trimmed();
+		}
+		else if (elem.tagName()=="textures"){
+			texturePath = elem.text().trimmed();
 		}
 		else if (elem.tagName()=="image"){
 			QDomElement cel=elem.firstChildElement();

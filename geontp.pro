@@ -18,6 +18,6 @@ SOURCES       = GLText.cpp \
 QT           += core gui opengl xml network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-#CONFIG       += 
-CONFIG       += debug
+DEFINES      += QT_NO_DEBUG_OUTPUT
+#CONFIG       += debug
 LIBS +=  -lglut -lGLU

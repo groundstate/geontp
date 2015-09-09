@@ -7,6 +7,9 @@
 	<!-- File containing client IPs and the twon/city where they are located -->
 	<clientdb>client.db</clientdb>
 	
+	<!-- path to the textures -->
+        <textures>~/geontp/textures</textures>
+	
 	<image>
 		<!-- path to the map file -->
 		<file>textures/freeaus.png</file>

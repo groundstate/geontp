@@ -93,6 +93,8 @@ private:
 
 		QString citydb,clientdb;
 		
+		QString texturePath;
+		
 		// image stuff
 		QString mapFileName;
 		double lat0,lon0,lat1,lon1;

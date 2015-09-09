@@ -65,7 +65,7 @@ class MapWidget : public QGLWidget{
 public:
 
 	MapWidget(QHash<QString,City *> &,QList<Server *> &,
-		QString mapFile,double ullat,double ullon,double lrlat,double lrlon,int prj,double rx,double ry,
+		QString mapFile,QString texPath,double ullat,double ullon,double lrlat,double lrlon,int prj,double rx,double ry,
 		QWidget *parent = 0, QGLWidget *shareWidget = 0);
 	~MapWidget();
 
@@ -131,6 +131,8 @@ private:
 	bool showBorders;
 	bool showPlaceNames;
 
+	 QString texturePath;
+	 
 	// lat/lon coordinate system
 	QString mapFileName;
 	int wtex,htex;

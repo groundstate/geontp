@@ -32,7 +32,7 @@ Server::Server(QString n,double latitude,double longitude)
 	name =n;
 	lat=latitude;
 	lon=longitude;
-	summingLength=2;
+	summingLength=20;
 	historyLength=500;
 	lastUpdate=QDateTime::currentDateTime();
 }

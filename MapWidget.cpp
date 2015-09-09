@@ -80,12 +80,13 @@ float border[]={2,-14.883333333,129.0,-31.7,129.0, // WA
 //
 
 MapWidget::MapWidget(QHash<QString,City *> &c,QList<Server *> &s,
-		QString mapFile,double ullat,double ullon,double lrlat,double lrlon,int prj,double rx,double ry,
+		QString mapFile,QString texPath,double ullat,double ullon,double lrlat,double lrlon,int prj,double rx,double ry,
 		QWidget *parent, QGLWidget *shareWidget)
     : QGLWidget(parent, shareWidget)
 {
 	
 	mapFileName = mapFile;
+	texturePath=texPath;
 	lat0=ullat;
 	lon0=ullon;
 	lat1=lrlat;
@@ -340,7 +341,7 @@ void MapWidget::initTextures()
 	glEnable(GL_TEXTURE_RECTANGLE_ARB);
 	
 	for (int i=0;i<=9;i++){
-		QString f=QString("textures/shine")+QString::number(i)+QString(".png");
+		QString f=texturePath + QString("/shine")+QString::number(i)+QString(".png");
 		QImage im(f);
 		setupTexture(im,&(shinetex[i]));
 	}
