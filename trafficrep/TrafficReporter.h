@@ -55,6 +55,7 @@ class TrafficReporter
 		void init(int,char **);
 		bool readConfig(string configPath);
 		string getConfigPath();
+		bool updatePIDFile();
 		
 		bool getLong(const char *, long *,long,string);
 		
@@ -69,6 +70,8 @@ class TrafficReporter
 		long maxHistory;
 		long port;
 		string interface;
+		
+		string pidFile;
 		
 		ofstream  appLog;
 		ofstream  debugLog;

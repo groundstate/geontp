@@ -102,6 +102,7 @@ TrafficReporter::~TrafficReporter()
 	web->stop();
 	appLog.close();
 	debugLog.close();
+	unlink(pidFile.c_str());
 	exit(EXIT_SUCCESS);
 }
 
@@ -170,8 +171,7 @@ void TrafficReporter::getPage(string &buf,int lastNSecs)
 	}
 	
 	list<Client *>::iterator curr = clients.begin();
-	while (curr != clients.end())
-	{
+	while (curr != clients.end()){
 		client = *curr;
 		unsigned int idt = (int) (1000 *(( client->rcvtime.tv_sec - tvref.tv_sec )+(client->rcvtime.tv_usec-tvref.tv_usec)/1.0E6));
 		
@@ -205,7 +205,6 @@ void TrafficReporter::getPage(string &buf,int lastNSecs)
 //
 //
 
-
 void TrafficReporter::init(int argc, char *argv[])
 {
 	
@@ -215,6 +214,7 @@ void TrafficReporter::init(int argc, char *argv[])
 	port=7777;
 	interface="eth0";
 	maxHistory=1000;
+	pidFile="trafficrep.pid";
 	
 	// This need to be open before we do anything so that startup problems can be logged
 	appLog.open(logFileName.c_str(),ios_base::app);
@@ -229,6 +229,11 @@ void TrafficReporter::init(int argc, char *argv[])
 	string cfgPath=getConfigPath();
 	if (cfgPath.size() > 0)
 		readConfig(cfgPath);
+	
+	if (!updatePIDFile()){
+		log("Unable to make pid file - already running?");
+		exit(EXIT_FAILURE);
+	}
 	
 	struct sigaction sa;
 	sigset_t sigioset;
@@ -288,6 +293,11 @@ bool TrafficReporter::readConfig(std::string configPath)
 		else if (0 == strcmp(elem->Value(),"port")){
 			getLong(elem->GetText(),&port,port,"Invalid value for port");
 		}
+		else if (0 == strcmp(elem->Value(),"pidfile")){
+			const char *text = elem->GetText();
+			if (text)
+				pidFile = text;
+		}
 	}	
 
 	return true;
@@ -299,15 +309,6 @@ string TrafficReporter::getConfigPath()
 	struct stat statbuf;
 	 
 	std::string cfgPath("./trafficrep.xml");// working directory first
-	if ((0 == stat(cfgPath.c_str(),&statbuf)))
-		return cfgPath;
-	
-	char *homedir = getenv("HOME");
-	cfgPath= string(homedir) +string("/trafficrep/trafficrep.xml");
-	if ((0 == stat(cfgPath.c_str(),&statbuf)))
-		return cfgPath;
-
-	cfgPath= string(homedir) + string("/.trafficrep/trafficrep.xml");
 	if ((0 == stat(cfgPath.c_str(),&statbuf)))
 		return cfgPath;
 	
@@ -324,6 +325,30 @@ string TrafficReporter::getConfigPath()
 	return cfgPath;
 }
 
+bool TrafficReporter::updatePIDFile()
+{
+	struct stat statbuf;
+	FILE *fpid;
+	if ((0==stat(pidFile.c_str(),&statbuf))){
+		// is it still running
+		fpid=fopen(pidFile.c_str(),"r");
+		int ipid;
+		if ((1!=fscanf(fpid,"%i",&ipid))) 
+			return false;
+		int ret=kill((pid_t) ipid,0);
+		if (ret == 0 || (ret==-1 && errno != ESRCH)) // not completely robust ...
+			return false; 
+		fclose(fpid);
+	}
+	
+	fpid=fopen(pidFile.c_str(),"w");
+	if (NULL!=fpid){
+		pid_t pid=getpid();
+		fprintf(fpid,"%i\n",(int) pid);
+		fclose(fpid);
+	}
+	return true;
+}
 
 bool TrafficReporter::getLong(const char *txt, long *val,long defaultValue,string msg){
 	
