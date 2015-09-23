@@ -104,16 +104,20 @@ void HTTPThread::doWork()
 		if (retval) 
 		{
 			len= sizeof(cli_addr);
-			if((socketfd = accept(listenfd, (struct sockaddr *)&cli_addr, &len)) < 0)
+			if((socketfd = accept(listenfd, (struct sockaddr *)&cli_addr, &len)) < 0){
 				app->log("ERROR in accept()");
+				app->log(strerror(errno));
+			}
 			else
 			{
 				processRequest(socketfd);
 				if (-1==shutdown(socketfd,SHUT_RDWR)){
 					app->log("ERROR in shutdown()");
+					app->log(strerror(errno));
 				}
 				if (-1==close(socketfd)){
 					app->log("ERROR in close()");
+					app->log(strerror(errno));
 				}
 			}
 		}
@@ -143,6 +147,7 @@ bool HTTPThread::init()
 	if((listenfd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK,0)) <0){
 	#endif
 		app->log("ERROR in socket()");
+		app->log(strerror(errno));
 		return false;
 	}
 	
@@ -157,11 +162,13 @@ bool HTTPThread::init()
 	
 	if(bind(listenfd, (struct sockaddr *)&serv_addr,sizeof(serv_addr)) <0){
 		app->log("ERROR in bind()");
+		app->log(strerror(errno));
 		return false;
 	}
 	
 	if( listen(listenfd,64) <0){
 		app->log("ERROR in listen()");
+		app->log(strerror(errno));
 		return false;
 	}
 	
@@ -186,7 +193,10 @@ void HTTPThread::processRequest(int fd)
 	}
 	if(ret > 0 && ret < BUFSIZE)	// return code is valid chars 
 		buffer[ret]=0;		// terminate the buffer 
-	else buffer[0]=0;
+	else{
+		app->log("browser request too long");
+		return;
+	}
 
 	for(i=0;i<ret;i++)	// remove CR and LF characters
 		if(buffer[i] == '\r' || buffer[i] == '\n')
