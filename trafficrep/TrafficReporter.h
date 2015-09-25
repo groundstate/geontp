@@ -52,7 +52,7 @@ class TrafficReporter
 	
 		static void signalHandler(int sig);
 		
-		void init(int,char **);
+		void init();
 		bool readConfig(string configPath);
 		string getConfigPath();
 		bool updatePIDFile();

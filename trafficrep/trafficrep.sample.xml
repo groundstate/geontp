@@ -11,5 +11,6 @@
 	<!-- listen port for http requests -->
 	<port>7777</port>
 	
-
+	<pidfile>./trafficrep.pid</pidfile>
+	
 </trafficrep>

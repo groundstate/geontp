@@ -48,7 +48,7 @@ using namespace std;
 #define APP_NAME "trafficrep"
 #define APP_VERSION "1.0"
 #define APP_AUTHOR "Michael Wouters"
-#define PRETTIFIER "*******************************************************"
+#define PRETTIFIER "*******************************************************" 
 
 extern TrafficReporter* app;
 extern ostream *debugStream;
@@ -57,9 +57,23 @@ TrafficReporter::TrafficReporter(int argc,char **argv)
 {
 	debugStream= NULL;
 	logFileName = string(APP_NAME) + ".log";
-	txtMode=false;;
+	txtMode=false;
+	pidFile="/var/run/trafficrep.pid";
+	packetFilter="dst port 123";
+	port=80;
+	interface="eth0";
+	maxHistory=1000;
+	
+	string cfgPath=getConfigPath();
+	if (cfgPath.size() > 0)
+		readConfig(cfgPath);
+	else{
+		cerr << "Unable to find a configuration file" << endl;
+		cfgPath="<not found>"; // for the log file
+	}
+	
 	char c;
-	while ((c=getopt(argc,argv,"hvl:d:t")) != -1)
+	while ((c=getopt(argc,argv,"hvl:d:p:t")) != -1)
 	{
 		switch(c)
   	{
@@ -87,11 +101,28 @@ TrafficReporter::TrafficReporter(int argc,char **argv)
 				logFileName = optarg;
 				break;
 			}
+			case 'p':
+			{
+				pidFile = optarg;
+				break;
+			}
 			case 't':txtMode=true;break;
 		}
 	}
 	
-  init( argc, argv );
+	appLog.open(logFileName.c_str(),ios_base::app);
+	if (!appLog.is_open()){
+		cerr << "Unable to open " << logFileName << endl;
+		exit(EXIT_FAILURE);
+	}
+	
+	log(PRETTIFIER);
+	log(string(APP_NAME) +  string(" v") + 
+		string(APP_VERSION) + string(", last modified ") + string(LAST_MODIFIED));
+	log(PRETTIFIER);
+	log(string("using config file ") + cfgPath);
+	
+  init();
 
 }
 
@@ -200,35 +231,12 @@ void TrafficReporter::getPage(string &buf,int lastNSecs)
 	
 }
 
-		
 //
 //
 //
 
-void TrafficReporter::init(int argc, char *argv[])
+void TrafficReporter::init()
 {
-	
-	//set all defaults
-	
-	packetFilter="dst port 123";
-	port=7777;
-	interface="eth0";
-	maxHistory=1000;
-	pidFile="trafficrep.pid";
-	
-	// This need to be open before we do anything so that startup problems can be logged
-	appLog.open(logFileName.c_str(),ios_base::app);
-	if (!appLog.is_open()){
-		cerr << "Unable to open " << logFileName << endl;
-	}
-	log(PRETTIFIER);
-	log(string(APP_NAME) +  string(" v") + 
-		string(APP_VERSION) + string(", last modified ") + string(LAST_MODIFIED));
-	log(PRETTIFIER);
-	
-	string cfgPath=getConfigPath();
-	if (cfgPath.size() > 0)
-		readConfig(cfgPath);
 	
 	if (!updatePIDFile()){
 		log("Unable to make pid file - already running?");
@@ -264,11 +272,8 @@ bool TrafficReporter::readConfig(std::string configPath)
 {
 
 	TiXmlDocument doc( configPath.c_str() );
-  if (!doc.LoadFile()){ 
+  if (!doc.LoadFile())
 		return false;
-	}
-	
-	log(string("using config file ") + configPath);
 		
   TiXmlElement* root = doc.RootElement( );
 
@@ -299,7 +304,7 @@ bool TrafficReporter::readConfig(std::string configPath)
 				pidFile = text;
 		}
 	}	
-
+	
 	return true;
 }
 
@@ -329,6 +334,7 @@ bool TrafficReporter::updatePIDFile()
 {
 	struct stat statbuf;
 	FILE *fpid;
+	
 	if ((0==stat(pidFile.c_str(),&statbuf))){
 		// is it still running
 		fpid=fopen(pidFile.c_str(),"r");
