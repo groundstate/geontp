@@ -185,16 +185,23 @@ void HTTPThread::processRequest(int fd)
 	//int j, file_fd, buflen, len;
 	long i, ret;
 	static char buffer[BUFSIZE+1]; 
-
+	string buf;
+	
 	ret =read(fd,buffer,BUFSIZE); 	// read HTTP request in one go 
 	if(ret == 0 || ret == -1) {	// read failure
 		app->log("failed to read browser request");
+		buf="HTTP/1.0 400 Bad Request\r\n"; 
+		writeBuffer(buf,fd);
+		sleep(1);
 		return;
 	}
 	if(ret > 0 && ret < BUFSIZE)	// return code is valid chars 
 		buffer[ret]=0;		// terminate the buffer 
 	else{
 		app->log("browser request too long");
+		buf="HTTP/1.0 400 Bad Request\r\n"; 
+		writeBuffer(buf,fd);
+		sleep(1);
 		return;
 	}
 
@@ -215,7 +222,7 @@ void HTTPThread::processRequest(int fd)
 			lastnsecs=86400;
 	}
 
-	string buf;
+	
 	
 	buf="HTTP/1.0 200 OK\r\nContent-Type: html\r\n\r\n"; // 39 bytes
 	writeBuffer(buf,fd);
