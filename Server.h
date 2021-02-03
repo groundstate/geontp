@@ -55,6 +55,8 @@ class Server{
 		QList<double> shortHistory;
 		QList<double> longHistory;
 		
+		int maxTraffic; // for scaling the traffic plot y-axis
+		
 };
 
 #endif

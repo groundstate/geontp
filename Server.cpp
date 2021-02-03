@@ -34,6 +34,7 @@ Server::Server(QString n,double latitude,double longitude)
 	lon=longitude;
 	summingLength=20;
 	historyLength=500;
+	maxTraffic=500;
 	lastUpdate=QDateTime::currentDateTime();
 }
 

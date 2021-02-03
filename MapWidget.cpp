@@ -375,6 +375,8 @@ void MapWidget::initTextures()
 		tens_.push_back(new GLText(this,QString::number(i*10),f)); // don't care about duplicate zero
 		hundreds_.push_back(new GLText(this,QString::number(i*100),f));
 	}
+	hundreds_.push_back(new GLText(this,QString::number(10*100),f)); // FIXME !!! Axis scaling for plots needs overhaul
+	
 	plotXAxisLabel_=new GLText(this,"time (hours prior to now)",f);
 	plotYAxisLabel_=new GLText(this,"requests/min",f);
 	
@@ -667,15 +669,16 @@ void MapWidget::showTrafficPlot()
 	int ntenhours = trunc((historyLength/3600.0)/10);
 	if (ntenhours > 9) ntenhours=9;
 	double xsf = (pw-plm)*3600.0/historyLength; // in units of hours
-	double ysf = (ph - pbm)/400.0; // FIXME
+	double ysf = (ph - pbm)/(srv->maxTraffic); 
 	double ticlen=7.0;
+	int nyticks = (srv->maxTraffic)/100;
 	glBegin(GL_LINES);
 	for (int i=0;i<=ntenhours;i++){
 		float xtic=pw/2.0-i*10.0*xsf;
 		glVertex3f(xtic,-ph/2.0+pbm,-1*sf);
 		glVertex3f(xtic,-ph/2.0+pbm-ticlen,-1*sf);
 	}
-	for (int i=0;i<=4;i+=2){
+	for (int i=0;i<=nyticks;i+=2){
 		float ytic=-ph/2.0+pbm+i*100*ysf;
 		glVertex3f(-pw/2.0+plm,ytic,-1*sf);
 		glVertex3f(-pw/2.0+plm-ticlen,ytic,-1*sf);
@@ -686,7 +689,7 @@ void MapWidget::showTrafficPlot()
 		float xtic=pw/2.0-i*10.0*xsf;	
 		tens_[i]->paint(xtic-tens_[i]->w/2.0,-ph/2.0+pbm-tens_[i]->h,-1*sf);
 	}
-	for (int i=0;i<=4;i+=2){
+	for (int i=0;i<=nyticks;i+=2){
 		float xtic=-pw/2.0+plm-ticlen-hundreds_[i]->w;
 		float ytic=-ph/2.0+pbm+i*100*ysf;
 		hundreds_[i]->paint(xtic,ytic,-1*sf);

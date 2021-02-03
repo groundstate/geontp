@@ -523,6 +523,7 @@ void MainWindow::readConfig(QString s){
 		else if (elem.tagName()=="server"){
 			QString name;
 			double latitude=999,longitude=999;
+			int maxTraffic=500;
 			int port=80;
 			QDomElement cel=elem.firstChildElement();
 			while(!cel.isNull()){
@@ -534,10 +535,14 @@ void MainWindow::readConfig(QString s){
 					latitude=cel.text().toDouble();
 				else if (cel.tagName() == "longitude")
 					longitude=cel.text().toDouble();
+				else if (cel.tagName() == "maxtraffic")
+					maxTraffic=cel.text().toInt();
 				cel=cel.nextSiblingElement();
 			}
 			if (!name.isNull() && (fabs(latitude) <= 90.0) && (fabs(longitude) <= 360.0)){
-				servers.append(new Server(name,latitude,longitude));
+				Server *srv = new Server(name,latitude,longitude);
+				srv->maxTraffic = maxTraffic;
+				servers.append(srv);
 				ServerPoll *poller = new ServerPoll(name,port,pollInterval,startDelay,"",-1,"","",this);
 				connect(poller,SIGNAL(clientDataReceived(QString,QByteArray )),this,SLOT(updateClientData(QString,QByteArray )));
 				pollers.append(poller);
