@@ -24,11 +24,47 @@
 // THE SOFTWARE.
 
 #include <QApplication>
+#include <QtDebug>
+#include <QFile>
+#include <QTextStream>
 
 #include "MainWindow.h"
 
+// This is for debugging when console output is unavailable 
+QString debugFile("/tmp/geontp.log");
+
+void myMessageHandler(QtMsgType type, const QMessageLogContext &, const QString & msg)
+{
+    QString txt;
+    switch (type) {
+    case QtDebugMsg:
+        txt = QString("Debug: %1").arg(msg);
+        break;
+    case QtWarningMsg:
+        txt = QString("Warning: %1").arg(msg);
+    break;
+    case QtCriticalMsg:
+        txt = QString("Critical: %1").arg(msg);
+    break;
+    case QtFatalMsg:
+        txt = QString("Fatal: %1").arg(msg);
+    break;
+    case QtInfoMsg:
+        txt = QString("Fatal: %1").arg(msg);
+    }
+    QFile dbgFile(debugFile);
+    dbgFile.open(QIODevice::WriteOnly | QIODevice::Append);
+    QTextStream ts(&dbgFile);
+    ts << txt << endl;
+}
+
 int main(int argc, char *argv[]){
 
+		//qInstallMessageHandler(myMessageHandler); 
+		//QFile dbgFile(debugFile); // scrub the last file
+    //dbgFile.open(QIODevice::WriteOnly);
+		//dbgFile.close();
+		
     QApplication app(argc, argv);
 		QStringList args = app.arguments(); 
     MainWindow mainWin(args);

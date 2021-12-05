@@ -27,9 +27,10 @@
 
 #include "Server.h"
 
-Server::Server(QString n,double latitude,double longitude)
+Server::Server(QString n,QString a,double latitude,double longitude)
 {
-	name =n;
+	name = n;
+	address = a;
 	lat=latitude;
 	lon=longitude;
 	summingLength=20;

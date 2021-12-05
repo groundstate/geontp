@@ -285,6 +285,10 @@ void MapWidget::paintGL()
 void MapWidget::resizeGL(int width, int height)
 {
 	
+	if (width < parentWidget()->width()){
+		setFixedSize(parentWidget()->width(),parentWidget()->height());
+	}
+	
 	projectionDirty=true;
 	
 	QFont font;
@@ -343,6 +347,8 @@ void MapWidget::initTextures()
 	for (int i=0;i<=9;i++){
 		QString f=texturePath + QString("/shine")+QString::number(i)+QString(".png");
 		QImage im(f);
+		if (im.isNull())
+			qWarning() << "MapWidget::initTextures() failed to load " << f;
 		setupTexture(im,&(shinetex[i]));
 	}
 

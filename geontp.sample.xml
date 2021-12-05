@@ -54,7 +54,8 @@
 	
 	<!-- Entries for the servers we are monitoring -->
 	<server>
-		<name>ntp1.somewhere.au</name>
+		<name>Server 1</name>
+		<address>ntp1.somewhere.au></address>
 		<!-- port that the agent trafficrep is listening on -->
 		<port>7777</port>
 		<latitude>-34.92869</latitude>
@@ -65,6 +66,7 @@
 	</server>
 	
 	<server>
+		<name>Server 2</name>
 		<name>ntp2.somewhere.au</name>
 		<port>7777</port>
 		<latitude>-27.4679</latitude>
@@ -72,14 +74,7 @@
 		<maxtraffic>600</maxtraffic>
 	</server>
 	
-	<server>
-		<name>ntp3.somewhere.au</name>
-		<port>7777</port>
-		<latitude>-33.866666667</latitude>
-		<longitude>151.2</longitude>
-		<maxtraffic>600</maxtraffic>
-		
-	</server>
+	
 	
 	<!-- Monitor power management -->
 	<power>

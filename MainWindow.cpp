@@ -48,7 +48,7 @@
 #include "MainWindow.h"
 
 #define APP_NAME "geontp"
-#define VERSION_INFO "v0.2.0"
+#define VERSION_INFO "v0.2.1"
 
 //#define NEUTER
 
@@ -236,7 +236,7 @@ void MainWindow::updateClientData(QString server, QByteArray data){
 	int serverID=-1;
 
 	for (int i=0;i<servers.size();i++){
-		if (server == servers[i]->name){
+		if (server == servers[i]->address){
 			serverID=i;
 			break;
 		}
@@ -521,7 +521,7 @@ void MainWindow::readConfig(QString s){
 			}
 		}
 		else if (elem.tagName()=="server"){
-			QString name;
+			QString name,address;
 			double latitude=999,longitude=999;
 			int maxTraffic=500;
 			int port=80;
@@ -529,6 +529,8 @@ void MainWindow::readConfig(QString s){
 			while(!cel.isNull()){
 				if (cel.tagName() == "name")
 					name=cel.text().trimmed();
+				else if (cel.tagName() == "address")
+					address=cel.text().trimmed();
 				else if (cel.tagName() == "port")
 					port=cel.text().toInt();
 				else if (cel.tagName() == "latitude")
@@ -539,17 +541,20 @@ void MainWindow::readConfig(QString s){
 					maxTraffic=cel.text().toInt();
 				cel=cel.nextSiblingElement();
 			}
-			if (!name.isNull() && (fabs(latitude) <= 90.0) && (fabs(longitude) <= 360.0)){
-				Server *srv = new Server(name,latitude,longitude);
+			if (!name.isNull() && !address.isNull() && (fabs(latitude) <= 90.0) && (fabs(longitude) <= 360.0)){
+				Server *srv = new Server(name,address,latitude,longitude);
 				srv->maxTraffic = maxTraffic;
 				servers.append(srv);
-				ServerPoll *poller = new ServerPoll(name,port,pollInterval,startDelay,"",-1,"","",this);
+				ServerPoll *poller = new ServerPoll(address,port,pollInterval,startDelay,"",-1,"","",this);
 				connect(poller,SIGNAL(clientDataReceived(QString,QByteArray )),this,SLOT(updateClientData(QString,QByteArray )));
 				pollers.append(poller);
 				startDelay+=2;
 				#ifndef NEUTER
 				poller->start(); 
 				#endif
+			}
+			else{
+				qWarning("Failed to configure server");
 			}
 		}
 		else if (elem.tagName()=="aliens"){

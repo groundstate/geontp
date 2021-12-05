@@ -37,14 +37,17 @@ class ClientPollRecord;
 class Server{
 	public:
 	
-		Server(QString ,double ,double );
+		Server(QString ,QString,double ,double );
 		
-		QString name;
+		QString name; // name is what is shown in the title of the traffic plot
+		QString address;  // address is what we plot
+		
 		double lat,lon;
 		QList<ClientPollRecord *> clients;
 		
 		void setHistoryLength(int);
 		void setSummingLength(int);
+		
 		void appendToHistory(double);
 		
 		int historyLength;
