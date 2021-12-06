@@ -5,7 +5,7 @@ Auckland			,-36, 52, 174, 45
 Ballarat			,-37, 34,	143, 51, R
 Bathurst			,-33, 25, 149, 35
 Bendigo				,-36, 46,	144, 17, V
-Brisbane			,-27, 28,	153, 01, Capital, Server
+Brisbane			,-27, 28,	153, 01, Capital
 Broken Hill		,-31, 58,	141, 27
 Broome        ,-17, 58, 122, 14, R
 Cairns				,-16, 55,	145, 47
@@ -14,7 +14,7 @@ Caloundra			,-26, 48,	153, 8
 Canberra			,-35, 18,	149, 08, V, Capital
 Ceduna				,-32,  7, 133, 41
 Charleville		,-26, 24, 146, 15
-Coonabarabran ,-31, 16,	149, 16
+Coonabarabran ,-31, 16,	149, 16, R
 Darwin				,-12, 28,	130, 51, R, Capital
 Devonport     ,-41, 11,	146, 21, R
 Dubbo					,-32, 15,	148, 36
@@ -25,15 +25,18 @@ Gosford				,-33, 25, 151, 21, V
 Goulburn			,-34, 45,	149, 44, R
 Gympie        ,-26, 11, 152, 39
 Hobart				,-42, 53,	147, 17, Capital
+Ipswich       ,-27, 37, 152, 46, X
 Katherine			,-14, 28,	132, 16
 Kalgoorlie    ,-30, 45, 121, 28
+Kempsey				,-31,  3, 152, 50
 Launceston		,-41, 27,	147, 09
 Lambton				,-32, 55,	151, 42, X
-Leeton				,-34, 33,	146, 24
+Leeton				,-34, 33,	146, 24, R
 Lismore				,-28, 48, 153, 17
 Longreach			,-23, 27, 144, 15
 Lower Hutt		,-41, 13, 174, 55, R
 Mackay				,-21, 9 , 149, 10
+Maitland      ,-32, 44, 151, 33, X
 Melbourne			,-37, 49,	144, 58,	Capital,	Server
 Mt Isa				,-20, 44,	139, 30
 Mullumbimby   ,-28, 33,	153, 30, X
@@ -48,6 +51,7 @@ Parkes        ,-33,  6,	148, 16, R
 Perth					,-31, 57,	115, 51, R, Capital,	Server
 Perisher Valley, -36, 24, 148, 25
 Port Augusta	,-32, 30, 137, 46
+Port Hedland  ,-20,  18, 118, 36, R
 Rockhampton		,-23, 22,	150, 30
 Shepparton		,-36, 23,	145, 24, R
 Sippy Downs   ,-26, 43,	153, 5,  X
@@ -55,6 +59,7 @@ Sydney				,-33, 52,	151, 12, V,	Capital,	Server
 Tamworth      , -31, 5, 150, 56
 Toowoomba			,-27, 34,	151, 57, R
 Townsville		,-19, 15,	146, 49
+Westbury      ,-41, 32, 146, 50, X
 Wagga Wagga		,-35, 8 , 147, 21, R
 Waroona				,-32, 51, 115, 55, X
 Wollongong		,-34, 25,	150, 54, V
