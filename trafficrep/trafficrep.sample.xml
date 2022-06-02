@@ -9,8 +9,10 @@
 	<maxhistory>120</maxhistory>
 	
 	<!-- listen port for http requests -->
-	<port>7777</port>
+	<port>80</port>
 	
-	<pidfile>./trafficrep.pid</pidfile>
+	<pidfile>/var/run/trafficrep.pid</pidfile>
+	
+	<logfile>/usr/local/log/trafficrep.log</logfile>
 	
 </trafficrep>

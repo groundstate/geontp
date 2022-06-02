@@ -46,7 +46,7 @@
 using namespace std;
 
 #define APP_NAME "trafficrep"
-#define APP_VERSION "1.0"
+#define APP_VERSION "1.0.1"
 #define APP_AUTHOR "Michael Wouters"
 #define PRETTIFIER "*******************************************************" 
 
@@ -56,7 +56,7 @@ extern ostream *debugStream;
 TrafficReporter::TrafficReporter(int argc,char **argv)
 {
 	debugStream= NULL;
-	logFileName = string(APP_NAME) + ".log";
+	logFileName = "/usr/local/log/" + string(APP_NAME) + ".log";
 	txtMode=false;
 	pidFile="/var/run/trafficrep.pid";
 	packetFilter="dst port 123";
@@ -303,6 +303,11 @@ bool TrafficReporter::readConfig(std::string configPath)
 			if (text)
 				pidFile = text;
 		}
+		else if (0 == strcmp(elem->Value(),"logfile")){
+			const char *text = elem->GetText();
+			if (text)
+				logFileName = text;
+		}
 	}	
 	
 	return true;
@@ -314,6 +319,10 @@ string TrafficReporter::getConfigPath()
 	struct stat statbuf;
 	 
 	std::string cfgPath("./trafficrep.xml");// working directory first
+	if ((0 == stat(cfgPath.c_str(),&statbuf)))
+		return cfgPath;
+	
+	cfgPath= "/usr/local/etc/trafficrep.xml";
 	if ((0 == stat(cfgPath.c_str(),&statbuf)))
 		return cfgPath;
 	

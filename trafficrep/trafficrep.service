@@ -1,0 +1,10 @@
+[Unit]
+Description=NTP traffic reporter
+ConditionPathExists=/usr/local/etc/trafficrep.xml
+After=network-online.target
+
+[Service]
+ExecStart=/usr/local/bin/trafficrep
+
+[Install]
+WantedBy=multi-user.target

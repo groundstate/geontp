@@ -1,5 +1,8 @@
-BINDIR = $(HOME)/bin
+SHELL = /bin/bash
+BINDIR = /usr/local/bin
+ETCDIR  = /usr/local/etc
 TARGET = trafficrep
+CONFIG = trafficrep.sample.xml
 GROUP = root
 CPP = g++ -O2 -Wall   
 CC = gcc -O2 -Wall 
@@ -42,7 +45,16 @@ tinyxmlerror.o:tinyxmlerror.cpp
 tinyxmlparser.o:tinyxmlparser.cpp
 
 install:
-	-/bin/cp ./$(TARGET) $(BINDIR)
-	
+	cp ./$(TARGET) $(BINDIR)
+	cp ./$(CONFIG) $(ETCDIR)
+	@ if [[ `systemctl` =~ -\.mount ]]; then \
+                echo "systemd detected"; \
+                cp trafficrep.service /lib/systemd/system; \
+                systemctl enable trafficrep.service; \
+                echo "Edit config and start the service"; \
+          else\
+                echo "unsupported init system";\
+          fi
+
 clean:
 	$(RM) *.o $(TARGET)
