@@ -46,7 +46,7 @@
 using namespace std;
 
 #define APP_NAME "trafficrep"
-#define APP_VERSION "1.0.1"
+#define APP_VERSION "1.0.2"
 #define APP_AUTHOR "Michael Wouters"
 #define PRETTIFIER "*******************************************************" 
 
@@ -72,7 +72,7 @@ TrafficReporter::TrafficReporter(int argc,char **argv)
 		cfgPath="<not found>"; // for the log file
 	}
 	
-	char c;
+	int c;
 	while ((c=getopt(argc,argv,"hvl:d:p:t")) != -1)
 	{
 		switch(c)
