@@ -46,7 +46,7 @@
 using namespace std;
 
 #define APP_NAME "trafficrep"
-#define APP_VERSION "1.0.2"
+#define APP_VERSION "1.0.3"
 #define APP_AUTHOR "Michael Wouters"
 #define PRETTIFIER "*******************************************************" 
 

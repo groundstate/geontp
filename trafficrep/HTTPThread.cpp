@@ -156,6 +156,10 @@ bool HTTPThread::init()
 		return false;
 	}
 	
+	int opt = 1;
+	// Forcefully reuse the port
+	setsockopt(listenfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+
 	serv_addr.sin_family = AF_INET;
 	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	serv_addr.sin_port = htons(port);

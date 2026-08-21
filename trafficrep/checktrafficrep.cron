@@ -1,0 +1,2 @@
+# Check trafficrep hasn't choked on too many TWAITs
+*/10 * * * * root /usr/local/sbin/check_trafficrep_sysd.sh >/dev/null 2>&1
